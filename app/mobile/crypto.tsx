@@ -46,27 +46,29 @@ export default function Crypto() {
   },[]);
 
   return (
-    <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
+    <ScrollView contentContainerStyle={{ padding:16 }}>
       <BackButton label="Back" />
       <Text style={{ fontSize:22, fontWeight:'900' }}>Crypto</Text>
 
-      <View style={{ flexDirection:'row', gap:8 }}>
-        <TabBtn label="Mining" active={tab==='MINING'} onPress={()=>setTab('MINING')} />
+      <View style={{ flexDirection:'row' }}>
+        <View style={{ marginRight:8 }}>
+          <TabBtn label="Mining" active={tab==='MINING'} onPress={()=>setTab('MINING')} />
+        </View>
         <TabBtn label="Market" active={tab==='MARKET'} onPress={()=>setTab('MARKET')} />
       </View>
 
       {tab==='MINING' && (
-        <View style={{ gap:10 }}>
-          <Text style={{ fontWeight:'800' }}>Choose Coin to Mine</Text>
-          <View style={{ flexDirection:'row', flexWrap:'wrap', gap:8 }}>
+        <View>
+          <Text style={{ fontWeight:'800', marginBottom:8 }}>Choose Coin to Mine</Text>
+          <View style={{ flexDirection:'row', flexWrap:'wrap', marginBottom:8 }}>
             {COINS.map(c=>(
-              <Pressable key={c} onPress={()=>s.setCryptoTarget(c)} style={{ paddingHorizontal:12, paddingVertical:8, borderRadius:10, backgroundColor: s.cryptoTarget===c ? '#111827' : '#e5e7eb' }}>
+              <Pressable key={c} onPress={()=>s.setCryptoTarget(c)} style={{ paddingHorizontal:12, paddingVertical:8, borderRadius:10, backgroundColor: s.cryptoTarget===c ? '#111827' : '#e5e7eb', marginRight:8, marginBottom:8 }}>
                 <Text style={{ color: s.cryptoTarget===c ? '#fff' : '#111827', fontWeight:'800' }}>{c}</Text>
               </Pressable>
             ))}
           </View>
 
-          <Text style={{ marginTop:8, color:'#6b7280' }}>
+          <Text style={{ color:'#6b7280' }}>
             Hashrate: <Text style={{ fontWeight:'800', color:'#111827' }}>{totalHash} H/s</Text> (≈ {est.toFixed(4)} {s.cryptoTarget}/week)
           </Text>
 
@@ -74,7 +76,7 @@ export default function Crypto() {
           {MINERS.map(m=>{
             const count = s.cryptoMiners[m.id] || 0;
             return (
-              <View key={m.id} style={{ backgroundColor:'#fff', borderRadius:12, borderWidth:1, borderColor:'#e5e7eb', padding:12, flexDirection:'row', justifyContent:'space-between', alignItems:'center' }}>
+              <View key={m.id} style={{ backgroundColor:'#fff', borderRadius:12, borderWidth:1, borderColor:'#e5e7eb', padding:12, flexDirection:'row', justifyContent:'space-between', alignItems:'center', marginTop:8 }}>
                 <View>
                   <Text style={{ fontWeight:'800' }}>{m.name}</Text>
                   <Text style={{ color:'#6b7280' }}>{m.hash} H/s</Text>
@@ -93,7 +95,7 @@ export default function Crypto() {
       )}
 
       {tab==='MARKET' && (
-        <View style={{ gap:12 }}>
+        <View>
           {COINS.map(c=>{
             const data=market[c];
             const history=data.history;

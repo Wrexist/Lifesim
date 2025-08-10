@@ -15,8 +15,10 @@ export default function TinderScreen() {
         <Text>No more profiles today</Text>
       )}
       {profile && (
-        <View style={{ flexDirection:'row', marginTop:16, gap:16 }}>
-          <Button title="Nope" onPress={() => setIndex(i => i + 1)} />
+        <View style={{ flexDirection:'row', marginTop:16 }}>
+          <View style={{ marginRight:16 }}>
+            <Button title="Nope" onPress={() => setIndex(i => i + 1)} />
+          </View>
           <Button title="Like" onPress={() => setIndex(i => i + 1)} />
         </View>
       )}

@@ -1,28 +1,80 @@
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import BackButton from '../../src/components/BackButton';
-import { useToast } from '../../src/ui/Toast';
+import { useState, useEffect } from 'react';
+import { useGame } from '../../src/store';
 
-const TICKERS = ['AAPL','MSFT','NVDA','AMZN','META'];
+const TICKERS = ['AAPL','MSFT','NVDA','AMZN','META'] as const;
+type Ticker = typeof TICKERS[number];
 
 export default function Stocks() {
-  const show = useToast(t=>t.show);
-  return (
-    <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
-      <BackButton label="Back" />
-      <Text style={{ fontSize:22, fontWeight:'900' }}>Stocks</Text>
+  const s = useGame();
+  const [market, setMarket] = useState<Record<Ticker, { price: number; history: number[] }>>(
+    TICKERS.reduce((acc, t) => ({ ...acc, [t]: { price: 100 + Math.random() * 400, history: [] } }), {} as any)
+  );
 
-      <View style={{ backgroundColor:'#fff', borderRadius:12, borderWidth:1, borderColor:'#e5e7eb', padding:12 }}>
-        <Text style={{ fontWeight:'800' }}>Watchlist (mock)</Text>
-        {TICKERS.map(t=>(
-          <View key={t} style={{ flexDirection:'row', justifyContent:'space-between', paddingVertical:6 }}>
-            <Text>{t}</Text>
-            <Text style={{ color:'#16a34a', fontWeight:'800' }}>${(50 + Math.random()*900 | 0)}</Text>
+  useEffect(() => {
+    const update = () => {
+      setMarket(m => {
+        const next = { ...m };
+        TICKERS.forEach(t => {
+          const prev = next[t].price;
+          const price = Math.max(1, prev * (1 + (Math.random() - 0.5) / 20));
+          const history = [...next[t].history, price].slice(-20);
+          next[t] = { price, history };
+        });
+        return next;
+      });
+    };
+    update();
+    const id = setInterval(update, 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16 }}>
+      <BackButton label="Back" />
+      <Text style={{ fontSize: 22, fontWeight: '900' }}>Stocks</Text>
+      {TICKERS.map(t => {
+        const data = market[t];
+        const history = data.history;
+        const prev = history[history.length - 2] || data.price;
+        const pct = ((data.price - prev) / prev) * 100;
+        const holding = s.stockPortfolio[t] || 0;
+        return (
+          <View
+            key={t}
+            style={{
+              backgroundColor: '#fff',
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: '#e5e7eb',
+              padding: 12,
+              marginBottom: 8,
+            }}
+          >
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={{ fontWeight: '800' }}>{t}</Text>
+              <Text style={{ fontWeight: '800', color: pct >= 0 ? '#16a34a' : '#dc2626' }}>
+                ${data.price.toFixed(2)} ({pct >= 0 ? '+' : ''}{pct.toFixed(2)}%)
+              </Text>
+            </View>
+            <View style={{ flexDirection: 'row', height: 30, marginTop: 4 }}>
+              {history.map((p, i) => {
+                const max = Math.max(...history, data.price);
+                const h = (p / max) * 30;
+                return (
+                  <View
+                    key={i}
+                    style={{ width: 4, height: h, backgroundColor: '#2563eb', marginRight: 1, alignSelf: 'flex-end' }}
+                  />
+                );
+              })}
+            </View>
+            <Text style={{ marginTop: 8 }}>Holding: {holding.toFixed(2)}</Text>
           </View>
-        ))}
-        <Pressable onPress={()=>show('Order placed (mock)')} style={{ marginTop:8, alignSelf:'flex-start', backgroundColor:'#16a34a', paddingHorizontal:12, paddingVertical:8, borderRadius:10 }}>
-          <Text style={{ color:'#fff', fontWeight:'800' }}>Buy AAPL</Text>
-        </Pressable>
-      </View>
+        );
+      })}
     </ScrollView>
   );
 }
+
