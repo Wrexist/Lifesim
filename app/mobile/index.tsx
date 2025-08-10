@@ -32,6 +32,7 @@ export default function MobileApps() {
 
       <View style={{ flexDirection:'row', flexWrap:'wrap', gap:12 }}>
         <Tile to="/mobile/relations" icon="people-outline"   title="Contacts"    subtitle="Manage relationships" />
+        <Tile to="/mobile/tinder"    icon="flame-outline"     title="Tinder"      subtitle="Swipe & match" />
         <Tile to="/mobile/study"     icon="school-outline"    title="Education"   subtitle="Learn & grow" />
         <Tile to="/mobile/ebay"      icon="cart-outline"      title="eBay"        subtitle="Weekly items" />
         <Tile to="/mobile/business"  icon="briefcase-outline" title="Company"     subtitle="Build your biz" />
