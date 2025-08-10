@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 import {
-  GameState, Perk, InventoryItem,
+  GameState, Perk, InventoryItem, Coin,
 } from './types';
 import {
   HOMES, FURNITURE_SETS, SHOP_ITEMS, FOODS, MARKET_CATALOG,
@@ -27,6 +27,14 @@ const COST = {
 };
 const canAct = (alive:boolean, jailed:number, energy:number, cost:number) =>
   alive && jailed<=0 && energy>0 && energy>=cost;
+
+const COINS: Coin[] = ['BTC','ETH','SOL','BNB','XRP'];
+const MINERS = [
+  { id:'USB_MINER',   name:'USB Miner',     price:120,  hash:  5 },
+  { id:'GPU_RIG',     name:'GPU Rig',       price:800,  hash: 40 },
+  { id:'ASIC_LITE',   name:'ASIC Lite',     price:1600, hash: 90 },
+  { id:'ASIC_PRO',    name:'ASIC Pro',      price:3200, hash:200 },
+];
 
 // ----------------- actions type -----------------
 type Actions = {
@@ -77,6 +85,11 @@ type Actions = {
 
   // job upgrades
   buyJobUpgrade: (jobId: string, kind: 'income' | 'energy') => void;
+
+  // crypto
+  setCryptoTarget: (coin: Coin) => void;
+  buyMiner: (id: string) => void;
+  sellCrypto: (coin: Coin, amount: number, price: number) => void;
 
   // DEV
   setDevMode: (on: boolean) => void;
@@ -153,6 +166,11 @@ const initialState: GameState = {
   ownedItems: [],
   foods: FOODS,
   shopItems: SHOP_ITEMS,
+
+  cryptoTarget: 'BTC',
+  cryptoPortfolio: { BTC:0, ETH:0, SOL:0, BNB:0, XRP:0 },
+  cryptoMiners: {},
+  stockPortfolio: { AAPL:0, MSFT:0, NVDA:0, AMZN:0, META:0 },
 
   activeBuffs: [],
   jobUpgrades: {},
@@ -539,6 +557,14 @@ sellOwnedItem: (id) => {
           health = clamp(health + 3); s.skills.fitness += 2;
         }
 
+        // crypto mining
+        const minerHash = Object.entries(s.cryptoMiners).reduce((sum, [id, qty]) => {
+          const def = MINERS.find(m => m.id === id); return sum + (def ? def.hash * qty : 0);
+        }, 0);
+        const mined = minerHash / 1000;
+        const cryptoPortfolio = { ...s.cryptoPortfolio };
+        cryptoPortfolio[s.cryptoTarget] = (cryptoPortfolio[s.cryptoTarget] || 0) + mined;
+
         // companies weekly revenue
         let money = s.money;
         s.companies.forEach(c => { money += (c.revenuePerWeek - c.costPerWeek); });
@@ -584,6 +610,7 @@ sellOwnedItem: (id) => {
           prisonWeeksLeft, energy, happiness, health, fame,
           money, loans,
           market: picks,
+          cryptoPortfolio,
           enrolledEducationId, educationWeeksLeft,
           activeBuffs,
           skills: { ...s.skills },
@@ -623,6 +650,26 @@ sellOwnedItem: (id) => {
           jobUpgrades: { ...s.jobUpgrades, [jobId]: next },
           money: s.money - price,
           notifications: [...s.notifications, { id: idStr(), message: kind === 'income' ? 'Income Boost purchased' : 'Energy Saver purchased' }]
+        });
+      },
+
+      // ===== crypto =====
+      setCryptoTarget: (coin) => set({ cryptoTarget: coin }),
+      buyMiner: (id) => {
+        const s = get();
+        const def = MINERS.find(m => m.id === id); if (!def || s.money < def.price) return;
+        const current = s.cryptoMiners[id] || 0;
+        set({
+          cryptoMiners: { ...s.cryptoMiners, [id]: current + 1 },
+          money: s.money - def.price,
+        });
+      },
+      sellCrypto: (coin, amount, price) => {
+        const s = get();
+        if (amount <= 0 || (s.cryptoPortfolio[coin] || 0) < amount) return;
+        set({
+          cryptoPortfolio: { ...s.cryptoPortfolio, [coin]: (s.cryptoPortfolio[coin] || 0) - amount },
+          money: s.money + amount * price,
         });
       },
 

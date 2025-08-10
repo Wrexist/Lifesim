@@ -1,5 +1,8 @@
 export type Perk = 'WORK_PAY' | 'MINDSET' | 'FAST_LEARNER' | 'GOOD_CREDIT';
 
+export type Coin = 'BTC' | 'ETH' | 'SOL' | 'BNB' | 'XRP';
+export type Ticker = 'AAPL' | 'MSFT' | 'NVDA' | 'AMZN' | 'META';
+
 export interface Skills { coding: number; business: number; social: number; fitness: number; hacking: number; }
 
 export interface Job {
@@ -103,6 +106,11 @@ export interface GameState {
   ownedItems: string[];
   foods: Food[];
   shopItems: ShopItem[];
+
+  cryptoTarget: Coin;
+  cryptoPortfolio: Record<Coin, number>;
+  cryptoMiners: Record<string, number>;
+  stockPortfolio: Record<Ticker, number>;
 
   // buffs from weekly eBay items
   activeBuffs: MarketBuff[];
