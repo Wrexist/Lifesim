@@ -10,6 +10,8 @@ import {
 } from './data/seed';
 import { tickWeeklyRelationships } from '../lib/tinder/logic';
 import { SEEDED_PROFILES } from '../lib/tinder/data/profiles';
+import { COMPANIES } from './data/companies';
+import { COINS, MINERS } from './data/crypto';
 
 // ----------------- helpers -----------------
 const clamp = (v: number, min = 0, max = 100) => Math.max(min, Math.min(max, v));
@@ -50,6 +52,17 @@ type Actions = {
   breakUp: () => void;
   giveGift: (cost: number) => void;
   apologize: () => void;
+
+  // business
+  startCompany: (companyId: string) => void;
+  hireEmployee: (companyId: string) => void;
+  upgradeMarketing: (companyId: string, level: 1 | 2 | 3) => void;
+  automateCompany: (companyId: string) => void;
+  upgradeCashflow: (companyId: string) => void;
+
+  // crypto
+  setMiningTarget: (coin: string) => void;
+  buyMiner: (minerId: string) => void;
 
   // shop/food
   buyItem: (id: string) => void;
@@ -138,6 +151,10 @@ const initialState: GameState = {
   educationWeeksLeft: undefined,
 
   companies: [],
+
+  cryptoTarget: 'BTC',
+  cryptoMiners: [],
+  cryptoPortfolio: { BTC:0, ETH:0, SOL:0, BNB:0, XRP:0 },
 
   hasUSB: false,
   darkWebUnlocked: false,
@@ -394,6 +411,92 @@ export const useGame = create<GameState & Actions>()(
         });
       },
 
+      // ===== business =====
+      startCompany: (id) => {
+        const s = get();
+        const def = COMPANIES.find(c => c.id === id); if (!def) return;
+        if (!s.educations.some(e => e.id === 'BUSINESS_101')) return;
+        if (s.companies.some(c => c.id === id)) return;
+        if (s.money < def.price) return;
+        const company = {
+          id: def.id,
+          name: def.name,
+          employees: 0,
+          revenuePerWeek: def.baseRev,
+          costPerWeek: def.baseRev * 0.2,
+          marketingLevel: 0,
+          automated: false,
+          cashflowLevel: 0,
+        };
+        set({
+          companies: [...s.companies, company],
+          money: s.money - def.price,
+        });
+      },
+      hireEmployee: (id) => {
+        const s = get();
+        const idx = s.companies.findIndex(c => c.id === id); if (idx === -1) return;
+        const c = { ...s.companies[idx] };
+        if (c.employees >= 25) return;
+        c.employees += 1;
+        c.revenuePerWeek += 100;
+        c.costPerWeek += 40;
+        const companies = [...s.companies];
+        companies[idx] = c;
+        set({ companies });
+      },
+      upgradeMarketing: (id, level) => {
+        const s = get();
+        const idx = s.companies.findIndex(c => c.id === id); if (idx === -1) return;
+        const c = { ...s.companies[idx] };
+        if (level <= c.marketingLevel) return;
+        const costMap = [0, 500, 1000, 2000];
+        const revMap = [0, 150, 300, 500];
+        const wkMap = [0, 50, 100, 200];
+        const cost = costMap[level] - costMap[c.marketingLevel];
+        if (s.money < cost) return;
+        c.revenuePerWeek += revMap[level] - revMap[c.marketingLevel];
+        c.costPerWeek += wkMap[level] - wkMap[c.marketingLevel];
+        c.marketingLevel = level;
+        const companies = [...s.companies];
+        companies[idx] = c;
+        set({ companies, money: s.money - cost });
+      },
+      automateCompany: (id) => {
+        const s = get();
+        const idx = s.companies.findIndex(c => c.id === id); if (idx === -1) return;
+        const c = { ...s.companies[idx] };
+        if (c.automated || s.money < 5000) return;
+        c.automated = true;
+        c.costPerWeek = Math.max(0, c.costPerWeek - 20);
+        const companies = [...s.companies];
+        companies[idx] = c;
+        set({ companies, money: s.money - 5000 });
+      },
+      upgradeCashflow: (id) => {
+        const s = get();
+        const idx = s.companies.findIndex(c => c.id === id); if (idx === -1) return;
+        const c = { ...s.companies[idx] };
+        if (c.cashflowLevel >= 1 || s.money < 3000) return;
+        c.cashflowLevel = 1;
+        c.revenuePerWeek += 200;
+        const companies = [...s.companies];
+        companies[idx] = c;
+        set({ companies, money: s.money - 3000 });
+      },
+
+      // ===== crypto =====
+      setMiningTarget: (coin) => set({ cryptoTarget: coin }),
+      buyMiner: (minerId) => {
+        const s = get();
+        const def = MINERS.find(m => m.id === minerId); if (!def) return;
+        if (s.money < def.price) return;
+        const miners = [...s.cryptoMiners];
+        const found = miners.find(m => m.id === minerId);
+        if (found) found.count += 1; else miners.push({ id: minerId, count: 1 });
+        set({ cryptoMiners: miners, money: s.money - def.price });
+      },
+
       // ===== shop / food =====
       buyItem: (id) => {
   const s = get();
@@ -558,6 +661,15 @@ sellOwnedItem: (id) => {
         let money = s.money;
         s.companies.forEach(c => { money += (c.revenuePerWeek - c.costPerWeek); });
 
+        // crypto mining
+        const hashRate = s.cryptoMiners.reduce((sum, m) => {
+          const def = MINERS.find(d => d.id === m.id);
+          return sum + (def ? def.hash * m.count : 0);
+        }, 0);
+        const mined = hashRate / 1000;
+        const cryptoPortfolio = { ...s.cryptoPortfolio };
+        cryptoPortfolio[s.cryptoTarget] = (cryptoPortfolio[s.cryptoTarget] || 0) + mined;
+
         // relationships passive income
         let relationships = s.relationships;
         if (relationships.length) {
@@ -615,6 +727,7 @@ sellOwnedItem: (id) => {
           enrolledEducationId, educationWeeksLeft,
           activeBuffs,
           skills: { ...s.skills },
+          cryptoPortfolio,
           marketPurchasedIds: [], // <-- reset weekly eBay lock
         });
       },
