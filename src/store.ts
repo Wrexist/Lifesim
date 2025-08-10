@@ -532,7 +532,7 @@ sellOwnedItem: (id) => {
         week += 1;
         let age = s.age;
         if (week > 52) { week = 1; year += 1; age += 1; }
-        let alive = s.alive;
+        let alive: boolean = s.alive;
         if (age >= 100) { alive = false; energy = 0; }
 
         // prison

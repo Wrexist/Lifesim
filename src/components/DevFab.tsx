@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ViewStyle, TextStyle } from 'react-native';
 import { useGame } from '../store';
 
 export default function DevFab() {
@@ -13,5 +13,15 @@ export default function DevFab() {
     </View>
   );
 }
-const btn = (bg:string)=>({ backgroundColor:bg, paddingHorizontal:12, paddingVertical:10, borderRadius:12, shadowColor:'#000', shadowOpacity:0.15, shadowRadius:6, shadowOffset:{width:0,height:3}});
-const txt = ()=>({ color:'#fff', fontWeight:'800' });
+const btn = (bg: string): ViewStyle => ({
+  backgroundColor: bg,
+  paddingHorizontal: 12,
+  paddingVertical: 10,
+  borderRadius: 12,
+  shadowColor: '#000',
+  shadowOpacity: 0.15,
+  shadowRadius: 6,
+  shadowOffset: { width: 0, height: 3 },
+});
+
+const txt = (): TextStyle => ({ color: '#fff', fontWeight: '800' });

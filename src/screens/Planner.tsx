@@ -17,15 +17,27 @@ const icons = {
 
 export default function PlannerScreen() {
   const {
-    doWork, doStudy, doGym, doSideJob, doBusiness, doDarkweb, doDate, doRest, nextWeek,
-    prisonWeeksLeft
+    doWork,
+    doStudy,
+    doGym,
+    doSideJob,
+    doBusiness,
+    doDarkweb,
+    doDate,
+    doRest,
+    nextWeek,
+    prisonWeeksLeft,
+    jobs,
   } = useGame();
 
+  const mainJobId = jobs.find(j => !j.street)?.id ?? jobs[0]?.id;
+  const sideJobId = jobs.find(j => j.street)?.id ?? jobs[0]?.id;
+
   const actions = [
-    { key: 'WORK',     sub: 'Energi −8 • +💰',       onPress: doWork,     icon: icons.WORK },
+    { key: 'WORK',     sub: 'Energi −8 • +💰',       onPress: () => doWork(mainJobId),     icon: icons.WORK },
     { key: 'STUDY',    sub: 'Energi −5 • +Färdighet',onPress: doStudy,    icon: icons.STUDY },
     { key: 'GYM',      sub: 'Energi −7 • 😊 +1',     onPress: doGym,      icon: icons.GYM },
-    { key: 'SIDE_JOB', sub: 'Energi −6 • +Lite 💰',  onPress: doSideJob,  icon: icons.SIDE_JOB },
+    { key: 'SIDE_JOB', sub: 'Energi −6 • +Lite 💰',  onPress: () => doSideJob(sideJobId),  icon: icons.SIDE_JOB },
     { key: 'BUSINESS', sub: 'Energi −6 • Bolag ↑',   onPress: doBusiness, icon: icons.BUSINESS },
     { key: 'DARKWEB',  sub: 'Energi −10 • Risk ↑',   onPress: doDarkweb,  icon: icons.DARKWEB },
     { key: 'DATE',     sub: 'Energi −4 • 😊 +2',     onPress: doDate,     icon: icons.DATE },
@@ -42,7 +54,7 @@ export default function PlannerScreen() {
           Välj aktivitet (direkt)
         </Text>
 
-        <View style={{ flexDirection:'row', flexWrap:'wrap', gap: '4%', rowGap:12 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
           {actions.map(a => (
             <ActivityCard
               key={a.key}

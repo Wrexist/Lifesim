@@ -16,7 +16,7 @@ vpn deploy          – sätt upp VPN nod (sänker risk lite)
 clear               – rensa terminal`;
 
 export default function DarkWebTerminal() {
-  const { darkWebUnlocked, hasUSB, risk, money, prisonDaysLeft } = useGame();
+  const { darkWebUnlocked, hasUSB, risk, money, prisonWeeksLeft } = useGame();
   const [input, setInput] = useState('');
   const [log, setLog] = useState<Log[]>([{ t: 'Dark Web v0.1 — skriv "help"' }]);
   const scrollRef = useRef<ScrollView>(null);
@@ -32,7 +32,7 @@ export default function DarkWebTerminal() {
     const cmd = parts[0]?.toLowerCase();
     const arg = parts.slice(1).join(' ');
 
-    if (prisonDaysLeft > 0) { append('Du sitter i fängelse. Terminal låst.'); return; }
+    if (prisonWeeksLeft > 0) { append('Du sitter i fängelse. Terminal låst.'); return; }
     if (!hasUSB) { append('USB krävs. Köp i Appshop.'); return; }
     if (!darkWebUnlocked) { append('Möt NPC för att låsa upp Dark Web.'); return; }
 
@@ -70,9 +70,9 @@ export default function DarkWebTerminal() {
           useGame.setState({ money: s.money + pay, risk: Math.min(100, s.risk + 8) });
           append(`DDoS mot "${arg}" lyckades. +${pay} kr. Risk +8%.`);
         } else if (roll > 1 - bustedChance || s.risk >= 85) {
-          const days = 3 + Math.floor(Math.random() * 3);
-          useGame.setState({ prisonDaysLeft: days, risk: Math.min(100, s.risk + 15) });
-          append(`Misslyckades & spårad. Fängelse ${days} dagar. Risk +15%.`);
+          const weeks = 1 + Math.floor(Math.random() * 2);
+          useGame.setState({ prisonWeeksLeft: weeks, risk: Math.min(100, s.risk + 15) });
+          append(`Misslyckades & spårad. Fängelse ${weeks} veckor. Risk +15%.`);
         } else {
           useGame.setState({ risk: Math.min(100, s.risk + 10) });
           append('DDoS misslyckades. Risk +10%.');
