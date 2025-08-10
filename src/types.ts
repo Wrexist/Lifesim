@@ -32,7 +32,16 @@ export interface Education {
 
 export interface Home { id: string; name: string; weeklyEnergy: number; weeklyHappiness: number; rentPerMonth: number; furnitureSlots: number; }
 export interface Furniture { id: string; name: string; energyBonus: number; happinessBonus: number; }
-export interface Company { id: string; name: string; employees: number; revenuePerWeek: number; costPerWeek: number; }
+export interface Company {
+  id: string;
+  name: string;
+  employees: number;
+  revenuePerWeek: number;
+  costPerWeek: number;
+  marketingLevel: number;
+  automated: boolean;
+  cashflowLevel: number;
+}
 export interface Loan { id: string; principal: number; annualRate: number; monthlyPayment: number; }
 export interface Time { week: number; year: number; }
 
@@ -93,6 +102,10 @@ export interface GameState {
   educationWeeksLeft?: number;
 
   companies: Company[];
+
+  cryptoTarget: string;
+  cryptoMiners: { id: string; count: number }[];
+  cryptoPortfolio: Record<string, number>;
 
   hasUSB: boolean;
   darkWebUnlocked: boolean;

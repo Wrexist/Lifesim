@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, ScrollView } from 'react-native';
 import { useGame } from '../store';
 
 function Row({ label, value }:{ label:string; value:string|number }) {
@@ -10,7 +10,7 @@ export default function StudyApp() {
   const enrolled = educations.find(e => e.id === enrolledEducationId);
 
   return (
-    <View style={{ padding:16, gap:12 }}>
+    <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
       <Text style={{ fontSize:18, fontWeight:'900' }}>Education</Text>
 
       {enrolled ? (
@@ -42,6 +42,6 @@ export default function StudyApp() {
           ))}
         </>
       )}
-    </View>
+    </ScrollView>
   );
 }
