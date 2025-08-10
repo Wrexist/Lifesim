@@ -8,6 +8,11 @@ export default function ComputerLayout() {
       <Stack.Screen name="ebay" options={{ title: 'eBay (Full)' }} />
       <Stack.Screen name="business" options={{ title: 'Company' }} />
       <Stack.Screen name="tinder" options={{ title: 'Tinder' }} />
+      <Stack.Screen name="crypto" options={{ title: 'Crypto' }} />
+      <Stack.Screen name="relations" options={{ title: 'Contacts' }} />
+      <Stack.Screen name="stocks" options={{ title: 'Stocks' }} />
+      <Stack.Screen name="study" options={{ title: 'Education' }} />
+      <Stack.Screen name="settings" options={{ title: 'Settings' }} />
     </Stack>
   );
 }
