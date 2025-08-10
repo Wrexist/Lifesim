@@ -24,6 +24,7 @@ export default function ComputerDesktop() {
       <View style={{ flexDirection:'row', flexWrap:'wrap', gap:18 }}>
         <DesktopIcon to="/computer/darkweb" icon="laptop-outline" label="Dark Web" />
         <DesktopIcon to="/computer/ebay"    icon="cart-outline"   label="eBay" />
+        <DesktopIcon to="/computer/tinder"  icon="flame-outline"  label="Tinder" />
         <DesktopIcon to="/computer/business" icon="briefcase-outline" label="Company" />
         <DesktopIcon to="/computer/crypto"  icon="logo-bitcoin"   label="Crypto" />
         <DesktopIcon to="/computer/stocks"  icon="trending-up-outline" label="Stocks" />

@@ -7,6 +7,7 @@ export default function ComputerLayout() {
       <Stack.Screen name="darkweb" options={{ title: 'Dark Web (Full)' }} />
       <Stack.Screen name="ebay" options={{ title: 'eBay (Full)' }} />
       <Stack.Screen name="business" options={{ title: 'Company' }} />
+      <Stack.Screen name="tinder" options={{ title: 'Tinder' }} />
     </Stack>
   );
 }

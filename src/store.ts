@@ -8,6 +8,8 @@ import {
 import {
   HOMES, FURNITURE_SETS, SHOP_ITEMS, FOODS, MARKET_CATALOG,
 } from './data/seed';
+import { tickWeeklyRelationships } from '../lib/tinder/logic';
+import { SEEDED_PROFILES } from '../lib/tinder/data/profiles';
 
 // ----------------- helpers -----------------
 const clamp = (v: number, min = 0, max = 100) => Math.max(min, Math.min(max, v));
@@ -141,6 +143,19 @@ const initialState: GameState = {
   darkWebUnlocked: false,
   prisonWeeksLeft: 0,
   risk: 0,
+
+  player: { tags: [], charisma: 0.5, reputationPenalty: 0 },
+
+  tinder: {
+    dailyDeck: [],
+    swipesRemaining: 15,
+    superLikesRemaining: 1,
+    profilesSeen: {},
+    pityActive: false,
+    settings: { preference: 'all', minAge: 18, maxAge: 60, radiusKm: 10 },
+  },
+
+  relationships: [],
 
   relationship: { partners: [], relationshipPoints: 0, currentPartnerId: undefined },
 
@@ -543,6 +558,18 @@ sellOwnedItem: (id) => {
         let money = s.money;
         s.companies.forEach(c => { money += (c.revenuePerWeek - c.costPerWeek); });
 
+        // relationships passive income
+        let relationships = s.relationships;
+        if (relationships.length) {
+          const res = tickWeeklyRelationships(
+            { relationships, money, player: s.player },
+            SEEDED_PROFILES,
+            week
+          );
+          money = res.money;
+          relationships = res.relationships;
+        }
+
         // education ticking
         let enrolledEducationId = s.enrolledEducationId;
         let educationWeeksLeft = s.educationWeeksLeft;
@@ -583,6 +610,7 @@ sellOwnedItem: (id) => {
           time: { week, year }, age, alive,
           prisonWeeksLeft, energy, happiness, health, fame,
           money, loans,
+          relationships,
           market: picks,
           enrolledEducationId, educationWeeksLeft,
           activeBuffs,
