@@ -192,8 +192,8 @@ export const useGame = create<GameState & Actions>()(
 
         // Upgrades (BOOSTED multipliers)
         const up = s.jobUpgrades[job.id] || { incomeBoostLvl: 0, energySaverLvl: 0 };
-        const payBoost = 1 + up.incomeBoostLvl * 0.25; // +25% per level
-        const energyCost = Math.max(1, COST.WORK - up.energySaverLvl * 3); // -3 energy per level
+        const payBonus = up.incomeBoostLvl * 20; // +$20 per level
+        const energyCost = Math.max(1, COST.WORK - up.energySaverLvl * 5); // -5 energy per level
 
         // Skill gate soft penalty
         const req = job.skillReq ?? {};
@@ -201,7 +201,7 @@ export const useGame = create<GameState & Actions>()(
         const penalty = missing ? 0.85 : 1;
 
         const workPay = s.perks.includes('WORK_PAY') ? 1.5 : 1;
-        const earn = Math.round((job.basePayPerHour * 8) * workPay * penalty * payBoost);
+        const earn = Math.round((job.basePayPerHour * 8 + payBonus) * workPay * penalty);
 
         let energy = clamp(s.energy - energyCost);
         let happiness = clamp(s.happiness - 1);
@@ -244,11 +244,11 @@ export const useGame = create<GameState & Actions>()(
         const job = s.jobs.find(j => j.id === jobId) ?? s.jobs.find(j => j.street);
         if (!job) return;
         const up = s.jobUpgrades[job.id] || { incomeBoostLvl: 0, energySaverLvl: 0 };
-        const energyCost = Math.max(1, baseCost - up.energySaverLvl * 3);
+        const energyCost = Math.max(1, baseCost - up.energySaverLvl * 5);
         if (!canAct(s.alive, s.prisonWeeksLeft, s.energy, energyCost)) return;
 
-        const payBoost = 1 + up.incomeBoostLvl * 0.25;
-        const earn = Math.round(30 * (s.perks.includes('WORK_PAY') ? 1.5 : 1) * payBoost);
+        const payBonus = up.incomeBoostLvl * 20;
+        const earn = Math.round((30 + payBonus) * (s.perks.includes('WORK_PAY') ? 1.5 : 1));
 
         let energy = clamp(s.energy - energyCost);
         let happiness = clamp(s.happiness - 1);
@@ -642,7 +642,7 @@ sellOwnedItem: (id) => {
       buyJobUpgrade: (jobId, kind) => {
         const s = get();
         const up = s.jobUpgrades[jobId] || { incomeBoostLvl: 0, energySaverLvl: 0 };
-        const price = kind === 'income' ? (200 + up.incomeBoostLvl * 250) : (200 + up.energySaverLvl * 250);
+        const price = 100 * ((kind === 'income' ? up.incomeBoostLvl : up.energySaverLvl) + 1);
         if (s.money < price) return;
         const next = { ...up };
         if (kind === 'income') next.incomeBoostLvl += 1;
