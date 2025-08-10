@@ -9,6 +9,9 @@ export default function ComputerLayout() {
       <Stack.Screen name="business" />
       <Stack.Screen name="crypto" />
       <Stack.Screen name="stocks" />
+      <Stack.Screen name="study" />
+      <Stack.Screen name="relations" />
+      <Stack.Screen name="tinder" />
     </Stack>
   );
 }

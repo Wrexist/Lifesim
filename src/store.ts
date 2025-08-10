@@ -8,6 +8,8 @@ import {
 import {
   HOMES, FURNITURE_SETS, SHOP_ITEMS, FOODS, MARKET_CATALOG,
 } from './data/seed';
+import { tickWeeklyRelationships } from '../lib/tinder/logic';
+import { SEEDED_PROFILES } from '../lib/tinder/data/profiles';
 
 // ----------------- helpers -----------------
 const clamp = (v: number, min = 0, max = 100) => Math.max(min, Math.min(max, v));
@@ -155,6 +157,19 @@ const initialState: GameState = {
   prisonWeeksLeft: 0,
   risk: 0,
 
+  player: { tags: [], charisma: 0.5, reputationPenalty: 0 },
+
+  tinder: {
+    dailyDeck: [],
+    swipesRemaining: 15,
+    superLikesRemaining: 1,
+    profilesSeen: {},
+    pityActive: false,
+    settings: { preference: 'all', minAge: 18, maxAge: 60, radiusKm: 10 },
+  },
+
+  relationships: [],
+
   relationship: { partners: [], relationshipPoints: 0, currentPartnerId: undefined },
 
   notifications: [],
@@ -195,8 +210,8 @@ export const useGame = create<GameState & Actions>()(
 
         // Upgrades (BOOSTED multipliers)
         const up = s.jobUpgrades[job.id] || { incomeBoostLvl: 0, energySaverLvl: 0 };
-        const payBoost = 1 + up.incomeBoostLvl * 0.25; // +25% per level
-        const energyCost = Math.max(1, COST.WORK - up.energySaverLvl * 3); // -3 energy per level
+        const payBonus = up.incomeBoostLvl * 20; // +$20 per level
+        const energyCost = Math.max(1, COST.WORK - up.energySaverLvl * 5); // -5 energy per level
 
         // Skill gate soft penalty
         const req = job.skillReq ?? {};
@@ -204,7 +219,7 @@ export const useGame = create<GameState & Actions>()(
         const penalty = missing ? 0.85 : 1;
 
         const workPay = s.perks.includes('WORK_PAY') ? 1.5 : 1;
-        const earn = Math.round((job.basePayPerHour * 8) * workPay * penalty * payBoost);
+        const earn = Math.round((job.basePayPerHour * 8 + payBonus) * workPay * penalty);
 
         let energy = clamp(s.energy - energyCost);
         let happiness = clamp(s.happiness - 1);
@@ -247,11 +262,11 @@ export const useGame = create<GameState & Actions>()(
         const job = s.jobs.find(j => j.id === jobId) ?? s.jobs.find(j => j.street);
         if (!job) return;
         const up = s.jobUpgrades[job.id] || { incomeBoostLvl: 0, energySaverLvl: 0 };
-        const energyCost = Math.max(1, baseCost - up.energySaverLvl * 3);
+        const energyCost = Math.max(1, baseCost - up.energySaverLvl * 5);
         if (!canAct(s.alive, s.prisonWeeksLeft, s.energy, energyCost)) return;
 
-        const payBoost = 1 + up.incomeBoostLvl * 0.25;
-        const earn = Math.round(30 * (s.perks.includes('WORK_PAY') ? 1.5 : 1) * payBoost);
+        const payBonus = up.incomeBoostLvl * 20;
+        const earn = Math.round((30 + payBonus) * (s.perks.includes('WORK_PAY') ? 1.5 : 1));
 
         let energy = clamp(s.energy - energyCost);
         let happiness = clamp(s.happiness - 1);
@@ -569,6 +584,18 @@ sellOwnedItem: (id) => {
         let money = s.money;
         s.companies.forEach(c => { money += (c.revenuePerWeek - c.costPerWeek); });
 
+        // relationships passive income
+        let relationships = s.relationships;
+        if (relationships.length) {
+          const res = tickWeeklyRelationships(
+            { relationships, money, player: s.player },
+            SEEDED_PROFILES,
+            week
+          );
+          money = res.money;
+          relationships = res.relationships;
+        }
+
         // education ticking
         let enrolledEducationId = s.enrolledEducationId;
         let educationWeeksLeft = s.educationWeeksLeft;
@@ -609,6 +636,7 @@ sellOwnedItem: (id) => {
           time: { week, year }, age, alive,
           prisonWeeksLeft, energy, happiness, health, fame,
           money, loans,
+          relationships,
           market: picks,
           cryptoPortfolio,
           enrolledEducationId, educationWeeksLeft,
@@ -641,7 +669,7 @@ sellOwnedItem: (id) => {
       buyJobUpgrade: (jobId, kind) => {
         const s = get();
         const up = s.jobUpgrades[jobId] || { incomeBoostLvl: 0, energySaverLvl: 0 };
-        const price = kind === 'income' ? (200 + up.incomeBoostLvl * 250) : (200 + up.energySaverLvl * 250);
+        const price = 100 * ((kind === 'income' ? up.incomeBoostLvl : up.energySaverLvl) + 1);
         if (s.money < price) return;
         const next = { ...up };
         if (kind === 'income') next.incomeBoostLvl += 1;

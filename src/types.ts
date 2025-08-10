@@ -1,3 +1,9 @@
+import type {
+  TinderState,
+  Relationship as TinderRelationship,
+  PlayerTinderInfo,
+} from '../lib/tinder/types';
+
 export type Perk = 'WORK_PAY' | 'MINDSET' | 'FAST_LEARNER' | 'GOOD_CREDIT';
 
 export type Coin = 'BTC' | 'ETH' | 'SOL' | 'BNB' | 'XRP';
@@ -95,6 +101,12 @@ export interface GameState {
   darkWebUnlocked: boolean;
   prisonWeeksLeft: number;
   risk: number;
+
+  // player meta for Tinder
+  player: PlayerTinderInfo;
+
+  tinder: TinderState;
+  relationships: TinderRelationship[];
 
   relationship: RelationshipState;
 
