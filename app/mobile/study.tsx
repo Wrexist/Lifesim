@@ -12,6 +12,7 @@ export default function StudyApp() {
 
   return (
     <View style={{ padding:16, gap:12 }}>
+      <BackButton label="Back" />
       <Text style={{ fontSize:18, fontWeight:'900' }}>Education</Text>
 
       {enrolled ? (

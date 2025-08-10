@@ -14,7 +14,7 @@ export default function DarkWeb() {
 
   return (
     <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
-      <BackButton label="Back to Computer" />
+      <BackButton label="Back" />
       <Text style={{ fontSize:22, fontWeight:'900' }}>Dark Web</Text>
 
       {!hasUSB && (

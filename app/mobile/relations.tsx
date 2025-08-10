@@ -10,6 +10,7 @@ export default function RelationsApp() {
 
   return (
     <View style={{ padding:16, gap:12 }}>
+      <BackButton label="Back" />
       <Text style={{ fontSize:18, fontWeight:'900' }}>Contacts</Text>
 
       {current ? (

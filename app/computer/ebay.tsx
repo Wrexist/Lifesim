@@ -1,8 +1,7 @@
 import { View, Text, Pressable, TextInput } from 'react-native';
 import { useState } from 'react';
 import { useGame } from '../../src/store';
-import Market from '../../app/market';
-export default Market;
+import BackButton from '../../src/components/BackButton';
 
 export default function EbayPC() {
   const { inventory, market, refreshMarket, sellListed, listInventoryItem, unlistInventoryItem, money } = useGame();
@@ -13,6 +12,7 @@ export default function EbayPC() {
 
   return (
     <View style={{ padding:16, gap:12 }}>
+      <BackButton label="Back" />
       <Text style={{ fontSize:18, fontWeight:'900' }}>eBay (Full)</Text>
 
       {/* Unlisted inventory: list items with a price */}

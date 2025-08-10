@@ -8,7 +8,7 @@ export default function Stocks() {
   const show = useToast(t=>t.show);
   return (
     <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
-      <BackButton label="Back to Apps" />
+      <BackButton label="Back" />
       <Text style={{ fontSize:22, fontWeight:'900' }}>Stocks</Text>
 
       <View style={{ backgroundColor:'#fff', borderRadius:12, borderWidth:1, borderColor:'#e5e7eb', padding:12 }}>

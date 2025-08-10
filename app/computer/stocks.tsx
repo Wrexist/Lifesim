@@ -30,7 +30,7 @@ export default function Stocks() {
 
   return (
     <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
-      <BackButton label="Back to Apps" />
+      <BackButton label="Back" />
       <Text style={{ fontSize:22, fontWeight:'900' }}>Stocks</Text>
 
       {TICKERS.map(t=>{

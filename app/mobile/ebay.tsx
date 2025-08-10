@@ -6,6 +6,7 @@ export default function EbayApp() {
   const { market, refreshMarket, buyMarketItem, inventory, money } = useGame();
   return (
     <View style={{ padding:16, gap:12 }}>
+      <BackButton label="Back" />
       <Text style={{ fontSize:18, fontWeight:'900' }}>eBay</Text>
       <Pressable onPress={refreshMarket} style={{ alignSelf:'flex-start', backgroundColor:'#e5f0ff', borderRadius:8, paddingHorizontal:10, paddingVertical:6 }}>
         <Text style={{ color:'#2563eb', fontWeight:'700' }}>Refresh</Text>

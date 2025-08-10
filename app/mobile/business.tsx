@@ -46,7 +46,7 @@ export default function Business() {
 
   return (
     <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>
-      <BackButton label="Back to Mobile" />
+      <BackButton label="Back" />
       <Text style={{ fontSize:22, fontWeight:'900' }}>Companies</Text>
 
       <Text style={{ color:'#6b7280' }}>Requires: <Text style={{ fontWeight:'800' }}>Business 101</Text></Text>
