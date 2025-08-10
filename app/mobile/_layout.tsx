@@ -9,7 +9,8 @@ export default function MobileLayout() {
       <Stack.Screen name="study" options={{ title: 'Education' }} />
       <Stack.Screen name="ebay" options={{ title: 'eBay (Mobile)' }} />
       <Stack.Screen name="business" options={{ title: 'Company' }} />
-      <Stack.Screen name="darkweb" options={{ title: 'Dark Web' }} />
+      <Stack.Screen name="crypto" options={{ title: 'Crypto' }} />
+      <Stack.Screen name="stocks" options={{ title: 'Stocks' }} />
       <Stack.Screen name="settings" options={{ title: 'Settings' }} />
     </Stack>
   );
