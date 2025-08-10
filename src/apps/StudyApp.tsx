@@ -33,10 +33,12 @@ export default function StudyApp() {
               <Row label="Gains" value={Object.entries(c.skillGains).map(([k,v])=>`${k}+${v}`).join(', ')} />
               <Pressable
                 onPress={()=>enrollEducation(c.id)}
-                disabled={money < c.cost}
-                style={{ marginTop:10, alignSelf:'flex-start', backgroundColor: money < c.cost ? '#e5e7eb' : '#16a34a', paddingHorizontal:14, paddingVertical:10, borderRadius:10 }}
+                disabled={c.completed || money < c.cost}
+                style={{ marginTop:10, alignSelf:'flex-start', backgroundColor: c.completed || money < c.cost ? '#e5e7eb' : '#16a34a', paddingHorizontal:14, paddingVertical:10, borderRadius:10 }}
               >
-                <Text style={{ color: money < c.cost ? '#6b7280' : '#fff', fontWeight:'800' }}>{money < c.cost ? 'Not enough' : 'Enroll'}</Text>
+                <Text style={{ color: c.completed || money < c.cost ? '#6b7280' : '#fff', fontWeight:'800' }}>
+                  {c.completed ? 'Completed' : money < c.cost ? 'Not enough' : 'Enroll'}
+                </Text>
               </Pressable>
             </View>
           ))}
