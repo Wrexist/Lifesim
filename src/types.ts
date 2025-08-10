@@ -28,6 +28,7 @@ export interface Education {
   weeksTotal: number;
   skillGains: Partial<Skills>;
   unlocksJobs?: string[];
+  completed?: boolean;
 }
 
 export interface Home { id: string; name: string; weeklyEnergy: number; weeklyHappiness: number; rentPerMonth: number; furnitureSlots: number; }

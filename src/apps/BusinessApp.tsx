@@ -14,7 +14,7 @@ export default function BusinessApp() {
   const show = useToast(t=>t.show);
 
   const owns = (id:string) => companies.some(c=>c.id===id);
-  const hasEdu = educations.some(e=>e.id==='BUSINESS_101');
+  const hasEdu = educations.some(e=>e.id==='BUSINESS_101' && e.completed);
 
   return (
     <ScrollView contentContainerStyle={{ padding:16, gap:12 }}>

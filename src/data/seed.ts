@@ -16,10 +16,10 @@ export const JOBS: Job[] = [
 ];
 
 export const EDUCATIONS: Education[] = [
-  { id: 'CERT_COMMS', name: 'Communication Certificate', cost: 120, weeksTotal: 4,  skillGains: { social: 2 }, unlocksJobs: ['BARISTA','RETAIL'] },
-  { id: 'BASIC_IT',   name: 'Basic IT',                   cost: 150, weeksTotal: 6,  skillGains: { coding: 1 }, unlocksJobs: ['HELPDESK'] },
-  { id: 'WEB_BOOT',   name: 'Web Dev Bootcamp',           cost: 600, weeksTotal: 16, skillGains: { coding: 3, business:1 }, unlocksJobs: ['JUNIOR_DEV','DATA_ANALYST'] },
-  { id: 'BUSINESS_101', name: 'Business 101',             cost: 200, weeksTotal: 8,  skillGains: { business: 2 } }
+  { id: 'CERT_COMMS', name: 'Communication Certificate', cost: 120, weeksTotal: 4,  skillGains: { social: 2 }, unlocksJobs: ['BARISTA','RETAIL'], completed: false },
+  { id: 'BASIC_IT',   name: 'Basic IT',                   cost: 150, weeksTotal: 6,  skillGains: { coding: 1 }, unlocksJobs: ['HELPDESK'], completed: false },
+  { id: 'WEB_BOOT',   name: 'Web Dev Bootcamp',           cost: 600, weeksTotal: 16, skillGains: { coding: 3, business:1 }, unlocksJobs: ['JUNIOR_DEV','DATA_ANALYST'], completed: false },
+  { id: 'BUSINESS_101', name: 'Business 101',             cost: 200, weeksTotal: 8,  skillGains: { business: 2 }, completed: false }
 ];
 
 export const HOMES: Home[] = [

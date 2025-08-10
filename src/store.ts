@@ -111,8 +111,8 @@ const DEFAULT_JOBS = [
 ];
 
 const DEFAULT_EDU = [
-  { id:'BUSINESS_101', name:'Business 101', cost:600, weeksTotal:8, skillGains:{ business:10, social:5 } },
-  { id:'CS_CERT',      name:'Coding Certificate', cost:700, weeksTotal:8, skillGains:{ coding:12 } },
+  { id:'BUSINESS_101', name:'Business 101', cost:600, weeksTotal:8, skillGains:{ business:10, social:5 }, completed:false },
+  { id:'CS_CERT',      name:'Coding Certificate', cost:700, weeksTotal:8, skillGains:{ coding:12 }, completed:false },
 ];
 
 function reseedCore(s: Partial<GameState> = {}) {
@@ -308,7 +308,7 @@ export const useGame = create<GameState & Actions>()(
 
       enrollEducation: (educationId) => {
         const s = get();
-        const c = s.educations.find(e => e.id === educationId); if (!c) return;
+        const c = s.educations.find(e => e.id === educationId); if (!c || c.completed) return;
         if (s.enrolledEducationId) return;
         if (s.money < c.cost) return;
         set({
@@ -415,7 +415,7 @@ export const useGame = create<GameState & Actions>()(
       startCompany: (id) => {
         const s = get();
         const def = COMPANIES.find(c => c.id === id); if (!def) return;
-        if (!s.educations.some(e => e.id === 'BUSINESS_101')) return;
+        if (!s.educations.some(e => e.id === 'BUSINESS_101' && e.completed)) return;
         if (s.companies.some(c => c.id === id)) return;
         if (s.money < def.price) return;
         const company = {
@@ -428,10 +428,10 @@ export const useGame = create<GameState & Actions>()(
           automated: false,
           cashflowLevel: 0,
         };
-        set({
-          companies: [...s.companies, company],
-          money: s.money - def.price,
-        });
+        set(state => ({
+          companies: [...state.companies, company],
+          money: state.money - def.price,
+        }));
       },
       hireEmployee: (id) => {
         const s = get();
@@ -685,15 +685,21 @@ sellOwnedItem: (id) => {
         // education ticking
         let enrolledEducationId = s.enrolledEducationId;
         let educationWeeksLeft = s.educationWeeksLeft;
+        let educations = s.educations;
+        let skills = { ...s.skills };
+        let notifications = [...s.notifications];
         if (enrolledEducationId && educationWeeksLeft !== undefined) {
           const mult = s.perks.includes('FAST_LEARNER') ? 1.5 : 1;
           educationWeeksLeft = Math.max(0, educationWeeksLeft - 1 * mult);
           if (educationWeeksLeft === 0) {
-            const ed = s.educations.find(e => e.id === enrolledEducationId)!;
-            const skills = { ...s.skills };
-            Object.entries(ed.skillGains).forEach(([k, v]) => (skills as any)[k] = (skills as any)[k] + (v ?? 0));
-            const notifications = [...s.notifications, { id: idStr(), message: `Finished ${ed.name}!` }];
-            set({ skills, notifications });
+            const idx = educations.findIndex(e => e.id === enrolledEducationId);
+            if (idx !== -1) {
+              const ed = educations[idx];
+              Object.entries(ed.skillGains).forEach(([k, v]) => (skills as any)[k] = (skills as any)[k] + (v ?? 0));
+              notifications = [...notifications, { id: idStr(), message: `Finished ${ed.name}!` }];
+              educations = [...educations];
+              educations[idx] = { ...ed, completed: true };
+            }
             enrolledEducationId = undefined; educationWeeksLeft = undefined;
           }
         }
@@ -725,8 +731,10 @@ sellOwnedItem: (id) => {
           relationships,
           market: picks,
           enrolledEducationId, educationWeeksLeft,
+          educations,
           activeBuffs,
-          skills: { ...s.skills },
+          skills,
+          notifications,
           cryptoPortfolio,
           marketPurchasedIds: [], // <-- reset weekly eBay lock
         });
