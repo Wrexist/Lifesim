@@ -35,7 +35,19 @@ export default function BottomTabs({ state, descriptors, navigation }: BottomTab
           if (!focused && !e.defaultPrevented) navigation.navigate(route.name as never);
         };
         return (
-          <Pressable key={route.key} onPress={onPress} style={{ minWidth: 64, alignItems: 'center', paddingVertical: 6, paddingHorizontal: 10, borderRadius: 12, backgroundColor: focused ? 'rgba(22,163,74,0.10)' : 'transparent' }}>
+          <Pressable
+            key={route.key}
+            onPress={onPress}
+            style={{
+              flex: 1,
+              minWidth: 0,
+              alignItems: 'center',
+              paddingVertical: 6,
+              paddingHorizontal: 4,
+              borderRadius: 12,
+              backgroundColor: focused ? 'rgba(22,163,74,0.10)' : 'transparent'
+            }}
+          >
             <Ionicons name={ICONS[route.name] || 'ellipse-outline'} size={22} color={focused ? '#16a34a' : '#6b7280'} />
             <Text style={{ fontSize: 12, color: focused ? '#111827' : '#6b7280', marginTop: 2 }}>
               {descriptors[route.key]?.options?.title ?? route.name}
